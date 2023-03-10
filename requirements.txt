@@ -1,0 +1,4 @@
+appscript>=1.2.2
+fire>=0.5.0
+PyMuPDF>=1.21.1
+pyobjc-framework-Cocoa>=9.0.1

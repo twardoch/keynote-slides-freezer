@@ -2,15 +2,15 @@
 """
 A Python tool for macOS to "freeze" a Keynote slides deck. It keeps only "safe" text objects that use specified fonts as text, and replaces the rest with a PDF.
 
-Useful if you make a Keynote deck that uses many different fonts. If you "freeze" the deck, you can easily convert it to PowerPoint, and optionally upload that to Google Slides, and the custom fonts will not be replaced by random fallback fonts. 
+Useful if you make a Keynote deck that uses many different fonts. If you "freeze" the deck, you can easily convert it to PowerPoint, and optionally upload that to Google Slides, and the custom fonts will not be replaced by random fallback fonts.
 
 The tool is command-line, and uses scripting to process an Apple Keynote `.key` file. It’s not very robust, due to limitations of the AppleScript interface for Keynote.
 
 1. Opens an input `.key` Keynote file and creates two copies in a temp folder, a "vector" and a "text" version.
-2. In the "text" version, removes non-text items and text items that use the supported font. 
-3. In the "vector" version, removes text items that do not use the supported font. 
-4. Exports the "vector" version to a PDF file, and splits it into separate pages. 
-5. Pastes each exported separate PDF into the "text" version, and sends it to the back. 
+2. In the "text" version, removes non-text items and text items that use the supported font.
+3. In the "vector" version, removes text items that do not use the supported font.
+4. Exports the "vector" version to a PDF file, and splits it into separate pages.
+5. Pastes each exported separate PDF into the "text" version, and sends it to the back.
 6. Removes all files except, keeps the "text" version as the output.
 
 The code defines a `KeynoteSlidesFreezer` class with methods for processing Keynote files in the macOS GUI. The class includes methods for opening and closing Keynote files, cleaning up text and vector slides, exporting the Keynote file to a PDF file, and splitting the PDF file into separate pages, and importing them. The process() method combines all these steps in a single function.
@@ -18,14 +18,13 @@ The code defines a `KeynoteSlidesFreezer` class with methods for processing Keyn
 The script uses the `appscript` and `AppKit` libraries to interact with Keynote on macOS. It also uses the `fitz` library for PDF manipulation.
 """
 
-import os
 import shutil
+import tempfile
 from pathlib import Path
 
 import fitz
 from AppKit import NSData, NSPasteboard, NSPDFPboardType
 from appscript import app, k, mactypes
-import tempfile
 
 
 class KeynoteSlidesFreezer:
@@ -125,9 +124,7 @@ class KeynoteSlidesFreezer:
     def safe_text_item(self, item):
         """Returns True if the given Keynote item is a safe text item, i.e., its font is one of the supported fonts."""
         font = item.object_text.font.get().split("-")[0]
-        return any(
-            (font.startswith(font_as_text) for font_as_text in self.fonts_as_text)
-        )
+        return any(font.startswith(font_as_text) for font_as_text in self.fonts_as_text)
 
     def clean_items(self, slide, items, keep_text_items):
         """
@@ -275,7 +272,7 @@ class KeynoteSlidesFreezer:
         self.pdf_pages_paths = []
         for i in range(self.pdf_file.page_count):
             # Create a new PDF file for the page
-            page_pdf_path = Path(self.pdf_pages_folder, f"{i+1:04}.pdf")
+            page_pdf_path = Path(self.pdf_pages_folder, f"{i + 1:04}.pdf")
             page_pdf_doc = fitz.open()
             page_pdf_doc.insert_pdf(self.pdf_file, from_page=i, to_page=i)
 

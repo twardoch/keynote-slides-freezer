@@ -4,13 +4,14 @@
 
 import re
 from pathlib import Path
+
 from setuptools import find_packages, setup
 
 NAME = "keynote_slides_freezer"
 
 
 def get_version(*args):
-    verstrline = open(Path(NAME, "__init__.py"), "rt").read()
+    verstrline = open(Path(NAME, "__init__.py")).read()
     VSRE = r"^__version__ = ['\"]([^'\"]*)['\"]"
     return mo[1] if (mo := re.search(VSRE, verstrline, re.M)) else "undefined"
 
@@ -40,7 +41,7 @@ setup(
     install_requires=requirements,
     license="Apache Software License 2.0",
     long_description=open(
-        Path(Path(__file__).parent, "README.md"), "r", encoding="utf-8"
+        Path(Path(__file__).parent, "README.md"), encoding="utf-8"
     ).read(),
     long_description_content_type="text/markdown",
     include_package_data=True,

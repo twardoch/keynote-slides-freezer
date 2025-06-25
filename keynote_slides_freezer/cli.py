@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import fire
+
 from .keynote_slides_freezer import KeynoteSlidesFreezer
 
 

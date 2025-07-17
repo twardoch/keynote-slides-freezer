@@ -1,0 +1,98 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "keynote-slides-freezer"
+dynamic = ["version"]
+description = "Python tool to 'freeze' a Keynote slidehow: keeps only text objects that use specified fonts as text, exports to PDF slides from the rest and builds a new deck that has the PDFs plus the 'safe' text boxes"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "Apache-2.0"}
+authors = [
+    {name = "Adam Twardoch", email = "adam+github@twardoch.com"},
+]
+keywords = [
+    "command-line",
+    "Keynote",
+    "Apple",
+    "macOS",
+    "slide deck",
+    "slideshow",
+    "PowerPoint",
+    "vector graphics",
+    "appscript library",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Operating System :: MacOS",
+]
+dependencies = [
+    "appscript>=1.2.2",
+    "fire>=0.5.0",
+    "PyMuPDF>=1.21.1",
+    "pyobjc-framework-Cocoa>=9.0.1",
+]
+
+[project.urls]
+Homepage = "https://github.com/twardoch/keynote-slides-freezer"
+Repository = "https://github.com/twardoch/keynote-slides-freezer"
+Issues = "https://github.com/twardoch/keynote-slides-freezer/issues"
+
+[project.scripts]
+keynote_freezer = "keynote_slides_freezer.cli:main"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "black>=23.0.0",
+    "flake8>=6.0.0",
+    "mypy>=1.0.0",
+    "build>=0.10.0",
+    "twine>=4.0.0",
+    "bump2version>=1.0.0",
+]
+
+[tool.setuptools.dynamic]
+version = {attr = "keynote_slides_freezer.__version__"}
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["keynote_slides_freezer*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+addopts = "--cov=keynote_slides_freezer --cov-report=term-missing --cov-report=html"
+
+[tool.black]
+line-length = 88
+target-version = ['py310']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true

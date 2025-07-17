@@ -1,0 +1,115 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  test:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install -e ".[dev]"
+    
+    - name: Update version from git
+      run: python version.py update
+    
+    - name: Run tests
+      run: ./scripts/test.sh
+
+  build-and-release:
+    runs-on: macos-latest
+    needs: test
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.10"
+    
+    - name: Install build dependencies
+      run: |
+        python -m pip install --upgrade pip build twine
+    
+    - name: Update version from git
+      run: python version.py update
+    
+    - name: Build package
+      run: python -m build
+    
+    - name: Check package
+      run: python -m twine check dist/*
+    
+    - name: Extract version from tag
+      id: extract_version
+      run: echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+    
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ steps.extract_version.outputs.version }}
+        body: |
+          Release ${{ steps.extract_version.outputs.version }}
+          
+          ## Installation
+          
+          ```bash
+          pip install keynote-slides-freezer==${{ steps.extract_version.outputs.version }}
+          ```
+          
+          ## Changes
+          
+          See [CHANGELOG.md](https://github.com/twardoch/keynote-slides-freezer/blob/main/CHANGELOG.md) for details.
+        draft: false
+        prerelease: false
+    
+    - name: Upload Release Asset (wheel)
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./dist/*.whl
+        asset_name: keynote_slides_freezer-${{ steps.extract_version.outputs.version }}-py3-none-any.whl
+        asset_content_type: application/zip
+    
+    - name: Upload Release Asset (source)
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./dist/*.tar.gz
+        asset_name: keynote_slides_freezer-${{ steps.extract_version.outputs.version }}.tar.gz
+        asset_content_type: application/gzip
+    
+    - name: Publish to PyPI
+      env:
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+      run: |
+        python -m twine upload dist/*

@@ -37,15 +37,41 @@ This tool is for anyone who uses Apple Keynote on macOS and needs to share their
 
 ## Installation
 
-`keynote-slides-freezer` is installed directly from its GitHub repository using `pip`. Ensure you have Python 3 (preferably 3.10 or newer) installed on your macOS system.
+`keynote-slides-freezer` can be installed in several ways:
 
-Open your Terminal and run:
+### Option 1: Install from PyPI (Recommended)
 
 ```bash
-python3 -m pip install --upgrade git+https://github.com/twardoch/keynote-slides-freezer
+pip install keynote-slides-freezer
 ```
 
-This command will download and install the package and its dependencies. The command-line tool `keynote_freezer` will then be available in your path.
+### Option 2: Install from GitHub
+
+```bash
+pip install git+https://github.com/twardoch/keynote-slides-freezer
+```
+
+### Option 3: Binary Release (macOS)
+
+Download the latest binary release from the [releases page](https://github.com/twardoch/keynote-slides-freezer/releases):
+
+```bash
+# Download and extract
+curl -L -o keynote_freezer-macos.tar.gz https://github.com/twardoch/keynote-slides-freezer/releases/latest/download/keynote_freezer-*-macos.tar.gz
+tar -xzf keynote_freezer-macos.tar.gz
+cd keynote_freezer-*-macos
+
+# Install
+./install.sh
+```
+
+### Requirements
+
+- macOS 10.15 or later
+- Python 3.10 or newer (for pip installation)
+- Apple Keynote installed
+
+After installation, the command-line tool `keynote_freezer` will be available in your path.
 
 ## Usage
 
@@ -213,12 +239,31 @@ Contributions are welcome and greatly appreciated! Whether it's reporting a bug,
     *   Improve documentation (docstrings, this README).
 *   **Submit Feedback:** Share your experience or suggestions by opening an issue.
 
-Please refer to the `CONTRIBUTING.rst` file in this repository for detailed guidelines on how to:
-*   Set up your development environment.
-*   Make changes and run tests (`flake8`, `pytest`, `tox`).
-*   Submit a pull request.
+### Development Setup
 
-Key guidelines for pull requests include writing tests for new functionality and updating documentation if necessary.
+```bash
+# Clone repository
+git clone https://github.com/twardoch/keynote-slides-freezer.git
+cd keynote-slides-freezer
+
+# Set up development environment
+make dev-setup
+
+# Run tests
+make test
+
+# Build package
+make build
+```
+
+For detailed development instructions, see [DEVELOPMENT.md](./DEVELOPMENT.md).
+
+### Pull Request Guidelines
+
+- Write tests for new functionality
+- Update documentation if necessary
+- Follow the existing code style (Black formatting)
+- Ensure all tests pass: `make test`
 
 ## License
 

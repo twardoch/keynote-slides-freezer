@@ -1,0 +1,144 @@
+name: Binary Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-binaries:
+    runs-on: macos-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.10"
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install -e ".[dev]"
+        python -m pip install pyinstaller
+    
+    - name: Update version from git
+      run: python version.py update
+    
+    - name: Build binary with PyInstaller
+      run: |
+        pyinstaller --onefile \
+          --name keynote_freezer \
+          --add-data "keynote_slides_freezer:keynote_slides_freezer" \
+          --hidden-import=keynote_slides_freezer.cli \
+          --hidden-import=keynote_slides_freezer.keynote_slides_freezer \
+          keynote_slides_freezer/cli.py
+    
+    - name: Test binary
+      run: |
+        ./dist/keynote_freezer --help
+    
+    - name: Extract version from tag
+      id: extract_version
+      run: echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+    
+    - name: Create binary package
+      run: |
+        mkdir -p binary-release
+        cp dist/keynote_freezer binary-release/
+        cp README.md binary-release/
+        cp LICENSE binary-release/
+        
+        # Create installation script
+        cat > binary-release/install.sh << 'EOF'
+        #!/bin/bash
+        # Installation script for keynote_freezer binary
+        
+        INSTALL_DIR="/usr/local/bin"
+        BINARY_NAME="keynote_freezer"
+        
+        # Check if running on macOS
+        if [[ "$OSTYPE" != "darwin"* ]]; then
+            echo "❌ This binary is only compatible with macOS"
+            exit 1
+        fi
+        
+        # Check if user has write permissions to install directory
+        if [[ ! -w "$INSTALL_DIR" ]]; then
+            echo "🔐 Installing to $INSTALL_DIR requires sudo permissions"
+            sudo cp "$BINARY_NAME" "$INSTALL_DIR/"
+            sudo chmod +x "$INSTALL_DIR/$BINARY_NAME"
+        else
+            cp "$BINARY_NAME" "$INSTALL_DIR/"
+            chmod +x "$INSTALL_DIR/$BINARY_NAME"
+        fi
+        
+        echo "✅ keynote_freezer installed to $INSTALL_DIR"
+        echo "🚀 You can now run: keynote_freezer --help"
+        EOF
+        
+        chmod +x binary-release/install.sh
+        
+        # Create README for binary release
+        cat > binary-release/README-BINARY.md << 'EOF'
+        # keynote_freezer Binary Release
+        
+        This is a standalone binary release of keynote_freezer for macOS.
+        
+        ## Installation
+        
+        ### Option 1: Automatic installation
+        ```bash
+        ./install.sh
+        ```
+        
+        ### Option 2: Manual installation
+        1. Copy the `keynote_freezer` binary to a directory in your PATH (e.g., `/usr/local/bin`)
+        2. Make it executable: `chmod +x /usr/local/bin/keynote_freezer`
+        
+        ## Usage
+        
+        ```bash
+        keynote_freezer --help
+        keynote_freezer your-presentation.key
+        ```
+        
+        ## Requirements
+        
+        - macOS 10.15 or later
+        - Apple Keynote installed
+        
+        ## Support
+        
+        For support and documentation, visit: https://github.com/twardoch/keynote-slides-freezer
+        EOF
+        
+        # Create archive
+        cd binary-release
+        tar -czf ../keynote_freezer-${{ steps.extract_version.outputs.version }}-macos.tar.gz *
+        cd ..
+    
+    - name: Upload binary artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: binary-macos
+        path: keynote_freezer-${{ steps.extract_version.outputs.version }}-macos.tar.gz
+    
+    - name: Get Release
+      id: get_release
+      uses: bruceadams/get-release@v1.3.2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Upload Binary Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.get_release.outputs.upload_url }}
+        asset_path: ./keynote_freezer-${{ steps.extract_version.outputs.version }}-macos.tar.gz
+        asset_name: keynote_freezer-${{ steps.extract_version.outputs.version }}-macos.tar.gz
+        asset_content_type: application/gzip

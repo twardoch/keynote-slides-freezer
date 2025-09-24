@@ -1,0 +1,2392 @@
+Project Structure:
+📁 keynote-slides-freezer
+├── 📁 .github
+│   ├── 📁 workflows
+│   │   ├── 📄 binary-release.yml
+│   │   ├── 📄 ci.yml
+│   │   └── 📄 release.yml
+│   └── 📄 ISSUE_TEMPLATE.md
+├── 📁 keynote_slides_freezer
+│   ├── 📄 __init__.py
+│   ├── 📄 cli.py
+│   └── 📄 keynote_slides_freezer.py
+├── 📁 keynote_slides_freezer.egg-info
+├── 📁 scripts
+│   ├── 📄 build-binary.sh
+│   ├── 📄 build.sh
+│   ├── 📄 dev-setup.sh
+│   ├── 📄 release.sh
+│   └── 📄 test.sh
+├── 📁 temp
+│   ├── 📁 proto-dump
+│   │   ├── 📁 CLU
+│   │   │   ├── 📁 CommandLineUtilities
+│   │   │   │   └── 📁 argtable
+│   │   │   │       └── ... (depth limit reached)
+│   │   │   └── 📁 CommandLineUtilities.xcodeproj
+│   │   │       └── 📁 xcuserdata
+│   │   │           └── ... (depth limit reached)
+│   │   ├── 📁 proto-dump
+│   │   ├── 📁 proto-dump.xcodeproj
+│   │   │   ├── 📁 project.xcworkspace
+│   │   │   │   └── 📁 xcshareddata
+│   │   │   │       └── ... (depth limit reached)
+│   │   │   └── 📁 xcshareddata
+│   │   │       └── 📁 xcschemes
+│   │   │           └── ... (depth limit reached)
+│   │   ├── 📁 Protobuf
+│   │   │   ├── 📁 packages
+│   │   │   └── 📁 prebuilt
+│   │   │       ├── 📁 bin
+│   │   │       │   └── ... (depth limit reached)
+│   │   │       ├── 📁 include
+│   │   │       │   └── ... (depth limit reached)
+│   │   │       └── 📁 lib
+│   │   │           └── ... (depth limit reached)
+│   │   └── 📁 ProtoDumpUnitTests
+│   │       ├── 📁 addressbook
+│   │       └── 📁 en.lproj
+│   └── 📁 SVG2Keynote-lib
+│       ├── 📁 cmake
+│       ├── 📁 cmake_modules
+│       ├── 📁 format_documentation
+│       ├── 📁 keynote-protos
+│       │   ├── 📁 gen
+│       │   ├── 📁 mapping
+│       │   ├── 📁 other
+│       │   │   ├── 📁 Numbers
+│       │   │   │   └── ... (depth limit reached)
+│       │   │   ├── 📁 Pages
+│       │   │   │   └── ... (depth limit reached)
+│       │   │   └── 📁 protos
+│       │   │       └── ... (depth limit reached)
+│       │   └── 📁 protos
+│       ├── 📁 keynote_lib
+│       │   ├── 📁 headers
+│       │   ├── 📁 lib
+│       │   │   ├── 📁 include
+│       │   │   │   └── ... (depth limit reached)
+│       │   │   └── 📁 nanosvg
+│       │   │       └── ... (depth limit reached)
+│       │   ├── 📁 models
+│       │   │   └── 📁 SlideObjects
+│       │   │       └── ... (depth limit reached)
+│       │   └── 📁 src
+│       │       ├── 📁 key_to_svg
+│       │       │   └── ... (depth limit reached)
+│       │       └── 📁 svg_to_key
+│       │           └── ... (depth limit reached)
+│       └── 📁 zipper
+│           ├── 📁 minizip
+│           │   └── 📁 aes
+│           │       └── ... (depth limit reached)
+│           ├── 📁 test
+│           └── 📁 zipper
+│               └── 📁 tps
+│                   └── ... (depth limit reached)
+├── 📁 tests
+│   ├── 📄 __init__.py
+│   ├── 📄 test_imports.py
+│   └── 📄 test_version.py
+├── 📄 .gitignore
+├── 📄 AUTHORS.rst
+├── 📄 CHANGELOG.md
+├── 📄 CONTRIBUTING.rst
+├── 📄 DEPLOYMENT.md
+├── 📄 DEVELOPMENT.md
+├── 📄 HISTORY.rst
+├── 📄 LICENSE
+├── 📄 Makefile
+├── 📄 pyproject.toml
+├── 📄 README.md
+├── 📄 requirements.txt
+├── 📄 requirements_dev.txt
+├── 📄 setup.py
+└── 📄 version.py
+
+
+<documents>
+<document index="1">
+<source>.editorconfig</source>
+<document_content>
+# http://editorconfig.org
+
+root = true
+
+[*]
+indent_style = space
+indent_size = 4
+trim_trailing_whitespace = true
+insert_final_newline = true
+charset = utf-8
+end_of_line = lf
+
+[*.bat]
+indent_style = tab
+end_of_line = crlf
+
+[LICENSE]
+insert_final_newline = false
+
+[Makefile]
+indent_style = tab
+
+</document_content>
+</document>
+
+<document index="2">
+<source>.github/ISSUE_TEMPLATE.md</source>
+<document_content>
+* keynote-slides-freezer version:
+* Python version:
+* Operating System:
+
+### Description
+
+Describe what you were trying to get done.
+Tell us what happened, what went wrong, and what you expected to happen.
+
+### What I Did
+
+```
+Paste the command(s) you ran and the output.
+If there was a crash, please include the traceback here.
+```
+
+</document_content>
+</document>
+
+<document index="3">
+<source>.github/workflows/binary-release.yml</source>
+<document_content>
+name: Binary Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-binaries:
+    runs-on: macos-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.10"
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install -e ".[dev]"
+        python -m pip install pyinstaller
+    
+    - name: Update version from git
+      run: python version.py update
+    
+    - name: Build binary with PyInstaller
+      run: |
+        pyinstaller --onefile \
+          --name keynote_freezer \
+          --add-data "keynote_slides_freezer:keynote_slides_freezer" \
+          --hidden-import=keynote_slides_freezer.cli \
+          --hidden-import=keynote_slides_freezer.keynote_slides_freezer \
+          keynote_slides_freezer/cli.py
+    
+    - name: Test binary
+      run: |
+        ./dist/keynote_freezer --help
+    
+    - name: Extract version from tag
+      id: extract_version
+      run: echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+    
+    - name: Create binary package
+      run: |
+        mkdir -p binary-release
+        cp dist/keynote_freezer binary-release/
+        cp README.md binary-release/
+        cp LICENSE binary-release/
+        
+        # Create installation script
+        cat > binary-release/install.sh << 'EOF'
+        #!/bin/bash
+        # Installation script for keynote_freezer binary
+        
+        INSTALL_DIR="/usr/local/bin"
+        BINARY_NAME="keynote_freezer"
+        
+        # Check if running on macOS
+        if [[ "$OSTYPE" != "darwin"* ]]; then
+            echo "❌ This binary is only compatible with macOS"
+            exit 1
+        fi
+        
+        # Check if user has write permissions to install directory
+        if [[ ! -w "$INSTALL_DIR" ]]; then
+            echo "🔐 Installing to $INSTALL_DIR requires sudo permissions"
+            sudo cp "$BINARY_NAME" "$INSTALL_DIR/"
+            sudo chmod +x "$INSTALL_DIR/$BINARY_NAME"
+        else
+            cp "$BINARY_NAME" "$INSTALL_DIR/"
+            chmod +x "$INSTALL_DIR/$BINARY_NAME"
+        fi
+        
+        echo "✅ keynote_freezer installed to $INSTALL_DIR"
+        echo "🚀 You can now run: keynote_freezer --help"
+        EOF
+        
+        chmod +x binary-release/install.sh
+        
+        # Create README for binary release
+        cat > binary-release/README-BINARY.md << 'EOF'
+        # keynote_freezer Binary Release
+        
+        This is a standalone binary release of keynote_freezer for macOS.
+        
+        ## Installation
+        
+        ### Option 1: Automatic installation
+        ```bash
+        ./install.sh
+        ```
+        
+        ### Option 2: Manual installation
+        1. Copy the `keynote_freezer` binary to a directory in your PATH (e.g., `/usr/local/bin`)
+        2. Make it executable: `chmod +x /usr/local/bin/keynote_freezer`
+        
+        ## Usage
+        
+        ```bash
+        keynote_freezer --help
+        keynote_freezer your-presentation.key
+        ```
+        
+        ## Requirements
+        
+        - macOS 10.15 or later
+        - Apple Keynote installed
+        
+        ## Support
+        
+        For support and documentation, visit: https://github.com/twardoch/keynote-slides-freezer
+        EOF
+        
+        # Create archive
+        cd binary-release
+        tar -czf ../keynote_freezer-${{ steps.extract_version.outputs.version }}-macos.tar.gz *
+        cd ..
+    
+    - name: Upload binary artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: binary-macos
+        path: keynote_freezer-${{ steps.extract_version.outputs.version }}-macos.tar.gz
+    
+    - name: Get Release
+      id: get_release
+      uses: bruceadams/get-release@v1.3.2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Upload Binary Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.get_release.outputs.upload_url }}
+        asset_path: ./keynote_freezer-${{ steps.extract_version.outputs.version }}-macos.tar.gz
+        asset_name: keynote_freezer-${{ steps.extract_version.outputs.version }}-macos.tar.gz
+        asset_content_type: application/gzip
+</document_content>
+</document>
+
+<document index="4">
+<source>.github/workflows/ci.yml</source>
+<document_content>
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Fetch all history for version calculation
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install -e ".[dev]"
+    
+    - name: Update version from git
+      run: python version.py update
+    
+    - name: Run code formatting check
+      run: python -m black --check keynote_slides_freezer/ tests/
+    
+    - name: Run linting
+      run: python -m flake8 keynote_slides_freezer/ tests/ --max-line-length=88 --extend-ignore=E203,W503
+    
+    - name: Run type checking
+      run: python -m mypy keynote_slides_freezer/ --ignore-missing-imports
+    
+    - name: Run tests
+      run: python -m pytest tests/ -v --cov=keynote_slides_freezer --cov-report=xml
+    
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: false
+
+  build:
+    runs-on: macos-latest
+    needs: test
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.10"
+    
+    - name: Install build dependencies
+      run: |
+        python -m pip install --upgrade pip build twine
+    
+    - name: Update version from git
+      run: python version.py update
+    
+    - name: Build package
+      run: python -m build
+    
+    - name: Check package
+      run: python -m twine check dist/*
+    
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: dist
+        path: dist/
+</document_content>
+</document>
+
+<document index="5">
+<source>.github/workflows/release.yml</source>
+<document_content>
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  test:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install -e ".[dev]"
+    
+    - name: Update version from git
+      run: python version.py update
+    
+    - name: Run tests
+      run: ./scripts/test.sh
+
+  build-and-release:
+    runs-on: macos-latest
+    needs: test
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.10"
+    
+    - name: Install build dependencies
+      run: |
+        python -m pip install --upgrade pip build twine
+    
+    - name: Update version from git
+      run: python version.py update
+    
+    - name: Build package
+      run: python -m build
+    
+    - name: Check package
+      run: python -m twine check dist/*
+    
+    - name: Extract version from tag
+      id: extract_version
+      run: echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+    
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ steps.extract_version.outputs.version }}
+        body: |
+          Release ${{ steps.extract_version.outputs.version }}
+          
+          ## Installation
+          
+          ```bash
+          pip install keynote-slides-freezer==${{ steps.extract_version.outputs.version }}
+          ```
+          
+          ## Changes
+          
+          See [CHANGELOG.md](https://github.com/twardoch/keynote-slides-freezer/blob/main/CHANGELOG.md) for details.
+        draft: false
+        prerelease: false
+    
+    - name: Upload Release Asset (wheel)
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./dist/*.whl
+        asset_name: keynote_slides_freezer-${{ steps.extract_version.outputs.version }}-py3-none-any.whl
+        asset_content_type: application/zip
+    
+    - name: Upload Release Asset (source)
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./dist/*.tar.gz
+        asset_name: keynote_slides_freezer-${{ steps.extract_version.outputs.version }}.tar.gz
+        asset_content_type: application/gzip
+    
+    - name: Publish to PyPI
+      env:
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+      run: |
+        python -m twine upload dist/*
+</document_content>
+</document>
+
+<document index="6">
+<source>.gitignore</source>
+<document_content>
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# PyInstaller
+#  Usually these files are written by a python script from a template
+#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+local_settings.py
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# celery beat schedule file
+celerybeat-schedule
+
+# SageMath parsed files
+*.sage.py
+
+# dotenv
+.env
+
+# virtualenv
+.venv
+venv/
+ENV/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+
+# IDE settings
+.vscode/
+.idea/
+
+.DS_Store
+temp/
+
+</document_content>
+</document>
+
+<document index="7">
+<source>.travis.yml</source>
+<document_content>
+# Config file for automatic testing at travis-ci.com
+
+language: python
+python:
+  - 3.10
+
+# Command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
+install: pip install -U tox-travis
+
+# Command to run tests, e.g. python setup.py test
+script: tox
+
+</document_content>
+</document>
+
+<document index="8">
+<source>AUTHORS.rst</source>
+<document_content>
+=======
+Credits
+=======
+
+Development Lead
+----------------
+
+* Adam Twardoch <adam+github@twardoch.com>
+
+Contributors
+------------
+
+None yet. Why not be the first?
+
+</document_content>
+</document>
+
+<document index="9">
+<source>CHANGELOG.md</source>
+<document_content>
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+### Added
+- Git-tag based semantic versioning system
+- Comprehensive test suite with pytest
+- Build and release scripts for automation
+- GitHub Actions CI/CD pipeline
+- Binary release generation with PyInstaller
+- Makefile for common development tasks
+- Development setup script
+- Type hints and MyPy checking
+- Code formatting with Black
+- Linting with Flake8
+- Coverage reporting
+- PyPI package distribution
+- Multi-platform binary releases for macOS
+
+### Changed
+- Migrated from setup.py to pyproject.toml
+- Updated package structure for modern Python packaging
+- Enhanced development workflow with automated scripts
+
+### Fixed
+- Package structure and import handling
+
+## [0.1.0] - 2024-XX-XX
+
+### Added
+- Initial release of keynote-slides-freezer
+- Core functionality for processing Keynote presentations
+- CLI interface with fire
+- AppleScript integration for Keynote automation
+- PDF processing with PyMuPDF
+- Font preservation system
+</document_content>
+</document>
+
+<document index="10">
+<source>CONTRIBUTING.rst</source>
+<document_content>
+.. highlight:: shell
+
+============
+Contributing
+============
+
+Contributions are welcome, and they are greatly appreciated! Every little bit
+helps, and credit will always be given.
+
+You can contribute in many ways:
+
+Types of Contributions
+----------------------
+
+Report Bugs
+~~~~~~~~~~~
+
+Report bugs at https://github.com/twardoch/keynote_slides_freezer/issues.
+
+If you are reporting a bug, please include:
+
+* Your operating system name and version.
+* Any details about your local setup that might be helpful in troubleshooting.
+* Detailed steps to reproduce the bug.
+
+Fix Bugs
+~~~~~~~~
+
+Look through the GitHub issues for bugs. Anything tagged with "bug" and "help
+wanted" is open to whoever wants to implement it.
+
+Implement Features
+~~~~~~~~~~~~~~~~~~
+
+Look through the GitHub issues for features. Anything tagged with "enhancement"
+and "help wanted" is open to whoever wants to implement it.
+
+Write Documentation
+~~~~~~~~~~~~~~~~~~~
+
+keynote-slides-freezer could always use more documentation, whether as part of the
+official keynote-slides-freezer docs, in docstrings, or even on the web in blog posts,
+articles, and such.
+
+Submit Feedback
+~~~~~~~~~~~~~~~
+
+The best way to send feedback is to file an issue at https://github.com/twardoch/keynote_slides_freezer/issues.
+
+If you are proposing a feature:
+
+* Explain in detail how it would work.
+* Keep the scope as narrow as possible, to make it easier to implement.
+* Remember that this is a volunteer-driven project, and that contributions
+  are welcome :)
+
+Get Started!
+------------
+
+Ready to contribute? Here's how to set up `keynote_slides_freezer` for local development.
+
+1. Fork the `keynote_slides_freezer` repo on GitHub.
+2. Clone your fork locally::
+
+    $ git clone git@github.com:your_name_here/keynote_slides_freezer.git
+
+3. Install your local copy into a virtualenv. Assuming you have virtualenvwrapper installed, this is how you set up your fork for local development::
+
+    $ mkvirtualenv keynote_slides_freezer
+    $ cd keynote_slides_freezer/
+    $ python setup.py develop
+
+4. Create a branch for local development::
+
+    $ git checkout -b name-of-your-bugfix-or-feature
+
+   Now you can make your changes locally.
+
+5. When you're done making changes, check that your changes pass flake8 and the
+   tests, including testing other Python versions with tox::
+
+    $ flake8 keynote_slides_freezer tests
+    $ python setup.py test or pytest
+    $ tox
+
+   To get flake8 and tox, just pip install them into your virtualenv.
+
+6. Commit your changes and push your branch to GitHub::
+
+    $ git add .
+    $ git commit -m "Your detailed description of your changes."
+    $ git push origin name-of-your-bugfix-or-feature
+
+7. Submit a pull request through the GitHub website.
+
+Pull Request Guidelines
+-----------------------
+
+Before you submit a pull request, check that it meets these guidelines:
+
+1. The pull request should include tests.
+2. If the pull request adds functionality, the docs should be updated. Put
+   your new functionality into a function with a docstring, and add the
+   feature to the list in README.rst.
+3. The pull request should work for Python 3.5, 3.6, 3.7 and 3.8, and for PyPy. Check
+   https://travis-ci.com/twardoch/keynote_slides_freezer/pull_requests
+   and make sure that the tests pass for all supported Python versions.
+
+Tips
+----
+
+To run a subset of tests::
+
+
+    $ python -m unittest tests.test_keynote_slides_freezer
+
+Deploying
+---------
+
+A reminder for the maintainers on how to deploy.
+Make sure all your changes are committed (including an entry in HISTORY.rst).
+Then run::
+
+$ bump2version patch # possible: major / minor / patch
+$ git push
+$ git push --tags
+
+Travis will then deploy to PyPI if tests pass.
+
+</document_content>
+</document>
+
+<document index="11">
+<source>DEPLOYMENT.md</source>
+<document_content>
+# Deployment Guide
+
+This document describes how to deploy and release keynote-slides-freezer using the automated CI/CD system.
+
+## Quick Reference
+
+### For Regular Releases
+
+1. **Create and push a git tag:**
+   ```bash
+   git tag -a v1.0.0 -m "Release v1.0.0"
+   git push origin v1.0.0
+   ```
+
+2. **GitHub Actions will automatically:**
+   - Run tests on multiple Python versions
+   - Build packages (wheel + source)
+   - Create GitHub release with assets
+   - Upload to PyPI
+   - Build and attach binary releases
+
+### For Local Development
+
+```bash
+# Quick setup
+make dev-setup
+
+# Run tests
+make test
+
+# Build locally
+make build
+
+# Build binary
+make binary
+
+# Manual release (if needed)
+make release VERSION=1.0.0
+```
+
+## Prerequisites
+
+### GitHub Repository Setup
+
+1. **PyPI API Token**: Add `PYPI_API_TOKEN` to repository secrets
+2. **GitHub Token**: Automatically available as `GITHUB_TOKEN`
+
+### Local Development Setup
+
+1. **macOS**: Required for binary builds and full testing
+2. **Python 3.10+**: For development and testing
+3. **Git**: For version management
+
+## Release Process
+
+### 1. Prepare Release
+
+```bash
+# Ensure you're on main branch
+git checkout main
+git pull origin main
+
+# Update CHANGELOG.md with release notes
+# Update version in any docs if needed
+
+# Commit changes
+git add -A
+git commit -m "Prepare release v1.0.0"
+git push origin main
+```
+
+### 2. Create Release Tag
+
+```bash
+# Create annotated tag
+git tag -a v1.0.0 -m "Release v1.0.0"
+
+# Push tag (this triggers the release)
+git push origin v1.0.0
+```
+
+### 3. Monitor Release
+
+1. **GitHub Actions**: Watch the workflows at `/actions`
+2. **PyPI**: Verify package at `https://pypi.org/project/keynote-slides-freezer/`
+3. **GitHub Release**: Check assets at `/releases`
+
+## CI/CD Workflows
+
+### CI Workflow (`.github/workflows/ci.yml`)
+
+**Triggered by**: Push/PR to main/develop
+
+**Steps**:
+1. Run tests on Python 3.10, 3.11, 3.12
+2. Code quality checks (Black, Flake8, MyPy)
+3. Build package
+4. Upload artifacts
+
+### Release Workflow (`.github/workflows/release.yml`)
+
+**Triggered by**: Git tag push (`v*`)
+
+**Steps**:
+1. Run full test suite
+2. Build packages
+3. Create GitHub release
+4. Upload to PyPI
+5. Attach package assets
+
+### Binary Release Workflow (`.github/workflows/binary-release.yml`)
+
+**Triggered by**: Git tag push (`v*`)
+
+**Steps**:
+1. Build macOS binary with PyInstaller
+2. Create installation package
+3. Attach to GitHub release
+
+## Version Management
+
+### Semantic Versioning
+
+- **Format**: `MAJOR.MINOR.PATCH`
+- **Git Tags**: `v1.0.0`, `v1.1.0`, `v2.0.0`
+- **Development**: `1.0.0.dev3+a1b2c3d` (auto-generated)
+
+### Version Sources
+
+1. **Git Tags**: Primary source for releases
+2. **Development**: Auto-generated from commits ahead of tag
+3. **Fallback**: `0.0.0+unknown` if no git info
+
+### Version Commands
+
+```bash
+# Show current version
+python3 version.py
+
+# Update __init__.py with git version
+python3 version.py update
+
+# Via Makefile
+make version
+make update-version
+```
+
+## Package Distribution
+
+### PyPI Package
+
+- **Name**: `keynote-slides-freezer`
+- **Installation**: `pip install keynote-slides-freezer`
+- **Formats**: Wheel (`.whl`) and Source (`.tar.gz`)
+
+### Binary Release
+
+- **Platform**: macOS only
+- **Format**: `.tar.gz` with installer
+- **Installation**: Extract and run `./install.sh`
+
+## Troubleshooting
+
+### Common Issues
+
+1. **PyPI Upload Fails**
+   - Check `PYPI_API_TOKEN` secret
+   - Verify version doesn't already exist
+   - Check package metadata
+
+2. **Binary Build Fails**
+   - Ensure running on macOS
+   - Check PyInstaller dependencies
+   - Verify imports work
+
+3. **Tests Fail**
+   - Check Python version compatibility
+   - Verify dependencies are installed
+   - Review platform-specific tests
+
+### Debug Commands
+
+```bash
+# Check package build
+python3 -m build
+python3 -m twine check dist/*
+
+# Test package installation
+pip install dist/*.whl
+
+# Verify CLI works
+keynote_freezer --help
+
+# Check version consistency
+python3 version.py
+python3 -c "import keynote_slides_freezer; print(keynote_slides_freezer.__version__)"
+```
+
+## Manual Recovery
+
+### If Automated Release Fails
+
+1. **Build locally**:
+   ```bash
+   make build
+   ```
+
+2. **Upload to PyPI**:
+   ```bash
+   python3 -m twine upload dist/*
+   ```
+
+3. **Create GitHub release**:
+   ```bash
+   gh release create v1.0.0 dist/* --title "Release v1.0.0"
+   ```
+
+### Rollback Process
+
+1. **Delete PyPI release**: Contact PyPI support
+2. **Delete GitHub release**: Use GitHub UI or API
+3. **Delete git tag**:
+   ```bash
+   git tag -d v1.0.0
+   git push origin --delete v1.0.0
+   ```
+
+## Security Considerations
+
+1. **API Tokens**: Store in GitHub secrets, never commit
+2. **Signed Releases**: Consider GPG signing for releases
+3. **Dependencies**: Regular security updates
+4. **Permissions**: Limit repository access
+
+## Monitoring
+
+### Success Indicators
+
+- ✅ All GitHub Actions workflows pass
+- ✅ Package available on PyPI
+- ✅ Binary attached to GitHub release
+- ✅ Version numbers consistent
+- ✅ Installation works: `pip install keynote-slides-freezer`
+
+### Metrics to Track
+
+- Release frequency
+- CI/CD success rate
+- Download statistics
+- Issue resolution time
+- Test coverage percentage
+</document_content>
+</document>
+
+<document index="12">
+<source>DEVELOPMENT.md</source>
+<document_content>
+# Development Guide
+
+This guide covers how to develop, test, and release keynote-slides-freezer.
+
+## Quick Start
+
+```bash
+# Set up development environment
+make dev-setup
+
+# Run tests
+make test
+
+# Build package
+make build
+
+# Build binary
+make binary
+
+# Release (example)
+make release VERSION=1.0.0
+```
+
+## Development Setup
+
+### Prerequisites
+
+- macOS 10.15 or later
+- Python 3.10 or later
+- Apple Keynote installed
+- Git
+
+### Setup Steps
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/twardoch/keynote-slides-freezer.git
+   cd keynote-slides-freezer
+   ```
+
+2. **Set up development environment**
+   ```bash
+   make dev-setup
+   ```
+
+   This will:
+   - Install the package in development mode
+   - Install all development dependencies
+   - Set up pre-commit hooks (if available)
+
+## Version Management
+
+This project uses **git-tag-based semantic versioning**:
+
+- **Version Format**: `MAJOR.MINOR.PATCH` (e.g., `1.0.0`)
+- **Git Tags**: `v1.0.0`, `v1.1.0`, `v2.0.0`, etc.
+- **Development Versions**: `1.0.0.dev3+a1b2c3d` (auto-generated)
+
+### Version Commands
+
+```bash
+# Show current version
+make version
+
+# Update version from git tags
+make update-version
+```
+
+## Testing
+
+### Run All Tests
+
+```bash
+make test
+```
+
+This runs:
+- Code formatting check (Black)
+- Linting (Flake8)
+- Type checking (MyPy)
+- Unit tests (pytest)
+- Coverage reporting
+
+### Individual Test Commands
+
+```bash
+# Format code
+make format
+
+# Run linting
+make lint
+
+# Run only unit tests
+python -m pytest tests/ -v
+
+# Run tests with coverage
+python -m pytest tests/ --cov=keynote_slides_freezer --cov-report=html
+```
+
+## Building
+
+### Build Python Package
+
+```bash
+make build
+```
+
+Output: `dist/keynote_slides_freezer-VERSION-py3-none-any.whl` and `dist/keynote_slides_freezer-VERSION.tar.gz`
+
+### Build Binary
+
+```bash
+make binary
+```
+
+Output: `keynote_freezer-VERSION-macos.tar.gz`
+
+The binary includes:
+- Standalone executable
+- Installation script
+- Documentation
+- License
+
+## Release Process
+
+### Automated Release (Recommended)
+
+1. **Create and push a git tag**
+   ```bash
+   git tag -a v1.0.0 -m "Release v1.0.0"
+   git push origin v1.0.0
+   ```
+
+2. **GitHub Actions will automatically:**
+   - Run tests on multiple Python versions
+   - Build Python packages
+   - Build binary releases
+   - Create GitHub release with assets
+   - Upload to PyPI
+
+### Manual Release
+
+```bash
+# Run tests and build
+make test
+make build
+
+# Create release (with dry-run option)
+make release VERSION=1.0.0 --dry-run
+
+# Actual release
+make release VERSION=1.0.0
+```
+
+## GitHub Actions
+
+### CI Pipeline (`.github/workflows/ci.yml`)
+
+**Triggers**: Push/PR to `main` or `develop`
+
+**Jobs**:
+- Test on Python 3.10, 3.11, 3.12
+- Code quality checks
+- Build package
+- Upload build artifacts
+
+### Release Pipeline (`.github/workflows/release.yml`)
+
+**Triggers**: Push git tag `v*`
+
+**Jobs**:
+- Run full test suite
+- Build and publish to PyPI
+- Create GitHub release
+- Upload package assets
+
+### Binary Release Pipeline (`.github/workflows/binary-release.yml`)
+
+**Triggers**: Push git tag `v*`
+
+**Jobs**:
+- Build macOS binary with PyInstaller
+- Create binary package
+- Upload to GitHub release
+
+## Project Structure
+
+```
+keynote-slides-freezer/
+├── keynote_slides_freezer/     # Main package
+│   ├── __init__.py
+│   ├── cli.py                  # Command-line interface
+│   └── keynote_slides_freezer.py  # Core functionality
+├── tests/                      # Test suite
+│   ├── __init__.py
+│   ├── test_imports.py
+│   └── test_version.py
+├── scripts/                    # Build and release scripts
+│   ├── build.sh
+│   ├── build-binary.sh
+│   ├── dev-setup.sh
+│   ├── release.sh
+│   └── test.sh
+├── .github/workflows/          # GitHub Actions
+│   ├── ci.yml
+│   ├── release.yml
+│   └── binary-release.yml
+├── pyproject.toml              # Python project configuration
+├── version.py                  # Version management
+├── Makefile                    # Common development tasks
+└── ...
+```
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests for new functionality
+5. Run the test suite: `make test`
+6. Submit a pull request
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Version not updating**: Run `make update-version`
+2. **Tests failing**: Check Python version (3.10+ required)
+3. **Binary build failing**: Ensure you're on macOS with Keynote installed
+4. **Import errors**: Run `make dev-setup` to reinstall dependencies
+
+### Debug Commands
+
+```bash
+# Check Python version
+python --version
+
+# Check package installation
+pip list | grep keynote
+
+# Check git tags
+git tag -l
+
+# Verbose test output
+python -m pytest tests/ -v -s
+```
+
+## Release Checklist
+
+Before releasing a new version:
+
+- [ ] Update `CHANGELOG.md` with changes
+- [ ] Run full test suite: `make test`
+- [ ] Build and test locally: `make build`
+- [ ] Test binary: `make binary`
+- [ ] Create and push git tag: `git tag -a vX.Y.Z -m "Release vX.Y.Z"`
+- [ ] Monitor GitHub Actions for successful deployment
+- [ ] Verify PyPI upload
+- [ ] Test installation: `pip install keynote-slides-freezer==X.Y.Z`
+</document_content>
+</document>
+
+<document index="13">
+<source>HISTORY.rst</source>
+<document_content>
+=======
+History
+=======
+
+0.1.0 (2023-03-10)
+------------------
+
+* First release on PyPI.
+
+</document_content>
+</document>
+
+<document index="14">
+<source>LICENSE</source>
+<document_content>
+Apache Software License 2.0
+
+Copyright (c) 2023, Adam Twardoch
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+</document_content>
+</document>
+
+<document index="15">
+<source>Makefile</source>
+<document_content>
+# Makefile for keynote-slides-freezer
+
+.PHONY: help install test build clean release binary dev-setup format lint
+
+help:  ## Show this help message
+	@echo "📋 Available commands:"
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
+
+install:  ## Install package in development mode
+	python -m pip install -e ".[dev]"
+
+dev-setup:  ## Set up development environment
+	./scripts/dev-setup.sh
+
+test:  ## Run tests
+	./scripts/test.sh
+
+format:  ## Format code
+	python -m black keynote_slides_freezer/ tests/
+
+lint:  ## Run linting
+	python -m flake8 keynote_slides_freezer/ tests/ --max-line-length=88 --extend-ignore=E203,W503
+
+build:  ## Build package
+	./scripts/build.sh
+
+binary:  ## Build binary
+	./scripts/build-binary.sh
+
+clean:  ## Clean build artifacts
+	rm -rf build/ dist/ *.egg-info/ __pycache__/ .pytest_cache/ .coverage htmlcov/ binary-release/
+	find . -name "*.pyc" -delete
+	find . -name "__pycache__" -type d -exec rm -rf {} +
+
+release:  ## Release package (usage: make release VERSION=1.0.0)
+	@if [ -z "$(VERSION)" ]; then \
+		echo "❌ Usage: make release VERSION=1.0.0"; \
+		exit 1; \
+	fi
+	./scripts/release.sh $(VERSION)
+
+version:  ## Show current version
+	@python version.py
+
+update-version:  ## Update version from git tags
+	python version.py update
+</document_content>
+</document>
+
+<document index="16">
+<source>README.md</source>
+<document_content>
+# keynote-slides-freezer
+
+**`keynote-slides-freezer` is a Python tool for macOS designed to "freeze" Apple Keynote slide decks. It intelligently processes your presentation, converting most content into PDF objects while preserving specified text elements as editable text. This is particularly useful for presentations rich in custom fonts, ensuring visual fidelity when converting to PowerPoint or Google Slides.**
+
+This tool addresses a common challenge: when Keynote presentations with unique or non-standard fonts are opened in other applications like PowerPoint or imported into Google Slides, these fonts are often substituted, leading to a broken layout and a compromised visual presentation. `keynote-slides-freezer` helps maintain your design by "baking in" the appearance of most slide elements.
+
+## Table of Contents
+
+- [Who is this tool for?](#who-is-this-tool-for)
+- [Why is it useful?](#why-is-it-useful)
+- [Installation](#installation)
+- [Usage](#usage)
+  - [Command-Line Interface (CLI)](#command-line-interface-cli)
+  - [Programmatic Usage](#programmatic-usage)
+- [Technical Details](#technical-details)
+  - [How it Works](#how-it-works)
+  - [Core Components](#core-components)
+  - [Key Dependencies](#key-dependencies)
+  - [Limitations](#limitations)
+- [Contributing](#contributing)
+- [License](#license)
+
+## Who is this tool for?
+
+This tool is for anyone who uses Apple Keynote on macOS and needs to share their presentations in formats like PowerPoint or Google Slides, especially when:
+
+*   You use many custom or non-standard fonts.
+*   You want to ensure that the visual layout and typography are preserved as much as possible across different platforms and applications.
+*   You are preparing a deck for wider distribution where recipients might not have your specific fonts installed.
+
+## Why is it useful?
+
+*   **Preserves Visual Fidelity:** Prevents font substitution issues when converting Keynote files, so your slides look as intended.
+*   **Cross-Platform Compatibility:** Makes Keynote decks more portable to PowerPoint and Google Slides.
+*   **Saves Time:** Automates the process of selectively rasterizing or vectorizing slide content, which would be tedious to do manually.
+*   **Maintains Editability for Key Text:** Allows you to specify fonts that should remain as editable text, offering a balance between visual preservation and future edits for essential content.
+
+## Installation
+
+`keynote-slides-freezer` can be installed in several ways:
+
+### Option 1: Install from PyPI (Recommended)
+
+```bash
+pip install keynote-slides-freezer
+```
+
+### Option 2: Install from GitHub
+
+```bash
+pip install git+https://github.com/twardoch/keynote-slides-freezer
+```
+
+### Option 3: Binary Release (macOS)
+
+Download the latest binary release from the [releases page](https://github.com/twardoch/keynote-slides-freezer/releases):
+
+```bash
+# Download and extract
+curl -L -o keynote_freezer-macos.tar.gz https://github.com/twardoch/keynote-slides-freezer/releases/latest/download/keynote_freezer-*-macos.tar.gz
+tar -xzf keynote_freezer-macos.tar.gz
+cd keynote_freezer-*-macos
+
+# Install
+./install.sh
+```
+
+### Requirements
+
+- macOS 10.15 or later
+- Python 3.10 or newer (for pip installation)
+- Apple Keynote installed
+
+After installation, the command-line tool `keynote_freezer` will be available in your path.
+
+## Usage
+
+`keynote-slides-freezer` can be used both as a command-line tool and programmatically in your Python scripts. **Note:** This tool interacts with the Keynote application GUI, so Keynote must be installed, and you may see it open and process files during operation.
+
+### Command-Line Interface (CLI)
+
+The primary way to use the tool is via the `keynote_freezer` command in your Terminal.
+
+**Basic Syntax:**
+
+```bash
+keynote_freezer INPUT_KEY_FILE [OPTIONS]
+```
+
+**Arguments and Options:**
+
+*   `INPUT_KEY_FILE`: (Required) The path to the Keynote file (`.key`) you want to process.
+*   `-f SAFE_FONTS` or `--fonts_as_text SAFE_FONTS`: (Optional) A comma-separated list of font family name prefixes to keep as editable text.
+    *   Default: `"Roboto"`
+    *   Example: `-f "Helvetica Neue,Arial,MyCustomFont"`
+*   `-o OUTPUT_KEY_FILE` or `--out_path OUTPUT_KEY_FILE`: (Optional) The full path for the processed output Keynote file.
+    *   Default: If not specified, the processed version is saved in the same folder as the `INPUT_KEY_FILE`, with `-frozen` appended to the original filename (e.g., `MySlides.key` becomes `MySlides-frozen.key`).
+
+**Examples:**
+
+1.  Process `MyPresentation.key` using the default safe font ("Roboto") and save it as `MyPresentation-frozen.key`:
+    ```bash
+    keynote_freezer "MyPresentation.key"
+    ```
+
+2.  Process `ConferenceDeck.key`, keeping text formatted with "Arial" or "Times New Roman" as editable text, and save to a specific path:
+    ```bash
+    keynote_freezer "ConferenceDeck.key" -f "Arial,Times New Roman" -o "/Users/yourname/Desktop/ConferenceDeck_Frozen.key"
+    ```
+
+### Programmatic Usage
+
+You can also use `keynote-slides-freezer` within your Python scripts for more complex workflows.
+
+```python
+from pathlib import Path
+from keynote_slides_freezer import KeynoteSlidesFreezer
+
+# Initialize the freezer
+freezer = KeynoteSlidesFreezer()
+
+# Define input and output paths
+input_file = Path("path/to/your/input.key")
+output_file = Path("path/to/your/output-frozen.key") # Optional
+
+# Specify fonts to keep as text (can be a list or a comma-separated string)
+safe_fonts = ["Arial", "Helvetica Neue", "MyCustomFont"]
+# or safe_fonts = "Arial,Helvetica Neue,MyCustomFont"
+
+try:
+    # Process the Keynote file
+    if output_file:
+        freezer.process(doc_path=input_file, fonts_as_text=safe_fonts, out_path=output_file)
+    else:
+        # If out_path is None, it will save with "-frozen" suffix in the same directory
+        freezer.process(doc_path=input_file, fonts_as_text=safe_fonts)
+    print(f"Successfully processed {input_file}")
+except Exception as e:
+    print(f"An error occurred: {e}")
+
+```
+
+The `process()` method takes the following arguments:
+*   `doc_path` (str or Path): The path to the input Keynote file.
+*   `fonts_as_text` (str or List[str], optional): A list or comma-separated string of font names to keep as text items. Defaults to `"Roboto"`.
+*   `out_path` (str or Path, optional): The path for the output Keynote file. If `None` or not provided, the output file is created in the same folder as the input file, with `-frozen` added to the base filename.
+
+## Technical Details
+
+This section describes how `keynote-slides-freezer` works under the hood.
+
+### How it Works
+
+The tool automates a multi-step process using AppleScript to control Keynote and other libraries for file manipulation. It's important to note that due to the reliance on AppleScript for GUI interaction, the process might not be perfectly robust for all complex Keynote files.
+
+The core workflow is as follows:
+
+1.  **Initialization & Duplication:**
+    *   The input `.key` Keynote file is identified.
+    *   Two copies of this file are created in a temporary folder:
+        *   A "vector" version (e.g., `input-pdf.key`)
+        *   A "text" version (e.g., `input-text.key`)
+
+2.  **Processing the "Text" Version:**
+    *   The "text" version is opened in Keynote.
+    *   For each slide:
+        *   Non-text items (images, shapes that are not text boxes, charts, tables, groups, lines) are deleted.
+        *   Text items that use fonts *not* in the user-specified `SAFE_FONTS` list are also deleted.
+        *   Only text items using the `SAFE_FONTS` remain.
+
+3.  **Processing the "Vector" Version:**
+    *   The "vector" version is opened in Keynote.
+    *   For each slide:
+        *   Text items that *do* use one of the `SAFE_FONTS` are deleted.
+        *   The goal is to keep all visual elements and text that will be converted to an image/vector object.
+
+4.  **PDF Export and Splitting:**
+    *   The modified "vector" version (containing non-safe-font text and all graphical elements) is exported from Keynote as a single PDF file (with best quality settings).
+    *   This PDF is then split into individual PDF files, one for each slide, using the `fitz` (PyMuPDF) library.
+
+5.  **Reconstructing the Final Deck:**
+    *   The "text" version (containing only the "safe" text items) is brought to the front.
+    *   For each slide in the "text" version:
+        *   The corresponding individual PDF page (generated in step 4) is pasted onto the slide.
+        *   This pasted PDF object (which now represents the visual background and non-safe text) is sent to the back, appearing behind the "safe" text items.
+
+6.  **Cleanup and Output:**
+    *   The original "vector" and intermediate PDF files are deleted from the temporary folder.
+    *   The modified "text" version, now containing the safe text overlaid on PDF representations of everything else, is saved to the specified output path (or the default `-frozen` path).
+    *   The temporary folder is cleaned up.
+
+### Core Components
+
+*   **`KeynoteSlidesFreezer` Class (in `keynote_slides_freezer.py`):**
+    *   This is the main class orchestrating the entire process.
+    *   `__init__()`: Initializes connections to Keynote and System Events via `appscript`, and sets up a temporary directory.
+    *   `process(doc_path, fonts_as_text, out_path)`: The main public method that drives the freezing workflow.
+    *   `_copy_doc()`: Handles copying the Keynote file.
+    *   `open_txtdoc()`, `open_vecdoc()`: Open the respective temporary Keynote files.
+    *   `safe_text_item(item)`: Checks if a Keynote item's font is in the `fonts_as_text` list.
+    *   `clean_items(slide, items, keep_text_items)`: Deletes items from a slide based on whether they are safe text or not.
+    *   `clean_slide(doc, slide, keep_text_items)`: Orchestrates the cleaning of a whole slide.
+    *   `process_vecdoc()`: Manages the cleaning of the vector document and its export to PDF.
+    *   `process_txtdoc()`: Manages the cleaning of the text document and the pasting of PDF pages.
+    *   `export_vecdoc()`: Exports the vector document to PDF using Keynote's export functionality.
+    *   `split_pdf()`: Splits the exported multi-page PDF into single-page PDFs using `fitz`.
+    *   `cleanup()`: Closes Keynote documents, moves the final result, and removes temporary files.
+
+*   **`cli.py`:**
+    *   Provides the command-line interface using the `fire` library.
+    *   The `main()` function initializes `KeynoteSlidesFreezer` and exposes its `process` method to the CLI.
+
+### Key Dependencies
+
+*   **`appscript`**: A Python bridge to AppleScript / Open Scripting Architecture, enabling control of scriptable macOS applications like Keynote.
+*   **`PyMuPDF (fitz)`**: A Python binding for MuPDF, used here for its robust PDF manipulation capabilities, specifically splitting PDF files.
+*   **`python-fire`**: A library for automatically generating command-line interfaces (CLIs) from Python objects.
+*   **`AppKit`**: Part of Python's PyObjC bridge, used here for interacting with the macOS pasteboard (`NSPasteboard`) to copy and paste PDF data.
+
+### Limitations
+
+*   **macOS Only:** This tool relies on Apple Keynote and macOS-specific technologies (AppleScript, AppKit), so it only runs on macOS.
+*   **Keynote Installation Required:** Apple Keynote must be installed on the system.
+*   **GUI Interaction:** The tool controls the Keynote GUI. You will see Keynote windows open and files being processed. This means it's not suitable for headless server environments.
+*   **Robustness:** As mentioned in the original documentation, controlling GUI applications via scripting can sometimes be fragile. Complex slides or unexpected Keynote dialogs might interrupt the process.
+*   **Font Name Specificity:** The `SAFE_FONTS` matching is based on font family name *prefixes*. This is generally effective but be mindful if you have fonts with very similar names.
+*   **Unsupported Elements:** While it aims to handle common slide elements, very complex or unusual Keynote objects might not be processed as expected.
+
+## Contributing
+
+Contributions are welcome and greatly appreciated! Whether it's reporting a bug, suggesting an enhancement, or writing code, your help makes this project better.
+
+**Ways to Contribute:**
+
+*   **Report Bugs:** If you find a bug, please open an issue on the [GitHub Issues page](https://github.com/twardoch/keynote-slides-freezer/issues). Include your OS version, Keynote version, steps to reproduce, and any error messages.
+*   **Suggest Features:** Have an idea for a new feature or an improvement? File an issue to discuss it.
+*   **Write Code:**
+    *   Fix bugs or implement new features. Look for issues tagged "bug" or "enhancement."
+    *   Improve documentation (docstrings, this README).
+*   **Submit Feedback:** Share your experience or suggestions by opening an issue.
+
+### Development Setup
+
+```bash
+# Clone repository
+git clone https://github.com/twardoch/keynote-slides-freezer.git
+cd keynote-slides-freezer
+
+# Set up development environment
+make dev-setup
+
+# Run tests
+make test
+
+# Build package
+make build
+```
+
+For detailed development instructions, see [DEVELOPMENT.md](./DEVELOPMENT.md).
+
+### Pull Request Guidelines
+
+- Write tests for new functionality
+- Update documentation if necessary
+- Follow the existing code style (Black formatting)
+- Ensure all tests pass: `make test`
+
+## License
+
+`keynote-slides-freezer` is licensed under the Apache License 2.0. You can find the full license text in the [LICENSE](./LICENSE) file.
+
+</document_content>
+</document>
+
+# File: /Users/adam/Developer/vcs/github.twardoch/pub/keynote-slides-freezer/keynote_slides_freezer/__init__.py
+# Language: python
+
+from .keynote_slides_freezer import KeynoteSlidesFreezer
+
+
+# File: /Users/adam/Developer/vcs/github.twardoch/pub/keynote-slides-freezer/keynote_slides_freezer/cli.py
+# Language: python
+
+import fire
+from .keynote_slides_freezer import KeynoteSlidesFreezer
+
+def main(()):
+
+
+# File: /Users/adam/Developer/vcs/github.twardoch/pub/keynote-slides-freezer/keynote_slides_freezer/keynote_slides_freezer.py
+# Language: python
+
+import shutil
+import tempfile
+from pathlib import Path
+import fitz
+from AppKit import NSData, NSPasteboard, NSPDFPboardType
+from appscript import app, k, mactypes
+
+class KeynoteSlidesFreezer:
+    """ KeynoteSlidesFreezer class for freezing the Keynote slides deck...."""
+    def __init__((self)):
+        """ Initializes a new KeynoteTricks instance...."""
+    def _file((self, path)):
+        """ Convert a file path to an `appscript` file object...."""
+    def _copy_doc((self, suf)):
+        """ Copies a Keynote deck and renames it with a suffix...."""
+    def open_txtdoc((self)):
+        """ Opens the text-specific deck in Keynote...."""
+    def open_vecdoc((self)):
+        """ Opens the vector-specific deck in Keynote...."""
+    def safe_text_item((self, item)):
+        """Returns True if the given Keynote item is a safe text item, i.e., its font is one of the supported f..."""
+    def clean_items((self, slide, items, keep_text_items)):
+        """ Deletes or hides items from the slide...."""
+    def clean_slide((self, doc, slide, keep_text_items)):
+        """ Cleans text and vector items of a slide...."""
+    def process_vecdoc((self)):
+        """ Processes the vector-specific Keynote deck: removes text items that use supported fonts from each s..."""
+    def process_txtdoc((self)):
+        """ Processes the text-specific Keynote deck: removes vector items and text items that use unsupported ..."""
+    def export_doc_png((self)):
+        """ Exports the deck as PNG images (not used)...."""
+    def export_vecdoc((self)):
+        """ Exports the deck to a PDF file...."""
+    def split_pdf((self)):
+        """ Splits the exported PDF individual pages...."""
+    def cleanup((self)):
+        """ Closes the decks and removes temporary files...."""
+    def process((self, doc_path, fonts_as_text=("Roboto"), out_path=None)):
+        """ 1. Opens the Keynote deck specified in `doc_path`..."""
+
+def __init__((self)):
+    """ Initializes a new KeynoteTricks instance...."""
+
+def _file((self, path)):
+    """ Convert a file path to an `appscript` file object...."""
+
+def _copy_doc((self, suf)):
+    """ Copies a Keynote deck and renames it with a suffix...."""
+
+def open_txtdoc((self)):
+    """ Opens the text-specific deck in Keynote...."""
+
+def open_vecdoc((self)):
+    """ Opens the vector-specific deck in Keynote...."""
+
+def safe_text_item((self, item)):
+    """Returns True if the given Keynote item is a safe text item, i.e., its font is one of the supported f..."""
+
+def clean_items((self, slide, items, keep_text_items)):
+    """ Deletes or hides items from the slide...."""
+
+def clean_slide((self, doc, slide, keep_text_items)):
+    """ Cleans text and vector items of a slide...."""
+
+def process_vecdoc((self)):
+    """ Processes the vector-specific Keynote deck: removes text items that use supported fonts from each s..."""
+
+def process_txtdoc((self)):
+    """ Processes the text-specific Keynote deck: removes vector items and text items that use unsupported ..."""
+
+def export_doc_png((self)):
+    """ Exports the deck as PNG images (not used)...."""
+
+def export_vecdoc((self)):
+    """ Exports the deck to a PDF file...."""
+
+def split_pdf((self)):
+    """ Splits the exported PDF individual pages...."""
+
+def cleanup((self)):
+    """ Closes the decks and removes temporary files...."""
+
+def process((self, doc_path, fonts_as_text=("Roboto"), out_path=None)):
+    """ 1. Opens the Keynote deck specified in `doc_path`..."""
+
+
+<document index="17">
+<source>pyproject.toml</source>
+<document_content>
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "keynote-slides-freezer"
+dynamic = ["version"]
+description = "Python tool to 'freeze' a Keynote slidehow: keeps only text objects that use specified fonts as text, exports to PDF slides from the rest and builds a new deck that has the PDFs plus the 'safe' text boxes"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "Apache-2.0"}
+authors = [
+    {name = "Adam Twardoch", email = "adam+github@twardoch.com"},
+]
+keywords = [
+    "command-line",
+    "Keynote",
+    "Apple",
+    "macOS",
+    "slide deck",
+    "slideshow",
+    "PowerPoint",
+    "vector graphics",
+    "appscript library",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Operating System :: MacOS",
+]
+dependencies = [
+    "appscript>=1.2.2",
+    "fire>=0.5.0",
+    "PyMuPDF>=1.21.1",
+    "pyobjc-framework-Cocoa>=9.0.1",
+]
+
+[project.urls]
+Homepage = "https://github.com/twardoch/keynote-slides-freezer"
+Repository = "https://github.com/twardoch/keynote-slides-freezer"
+Issues = "https://github.com/twardoch/keynote-slides-freezer/issues"
+
+[project.scripts]
+keynote_freezer = "keynote_slides_freezer.cli:main"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "black>=23.0.0",
+    "flake8>=6.0.0",
+    "mypy>=1.0.0",
+    "build>=0.10.0",
+    "twine>=4.0.0",
+    "bump2version>=1.0.0",
+]
+
+[tool.setuptools.dynamic]
+version = {attr = "keynote_slides_freezer.__version__"}
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["keynote_slides_freezer*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+addopts = "--cov=keynote_slides_freezer --cov-report=term-missing --cov-report=html"
+
+[tool.black]
+line-length = 88
+target-version = ['py310']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+</document_content>
+</document>
+
+<document index="18">
+<source>requirements.txt</source>
+<document_content>
+appscript>=1.2.2
+fire>=0.5.0
+PyMuPDF>=1.21.1
+pyobjc-framework-Cocoa>=9.0.1
+
+</document_content>
+</document>
+
+<document index="19">
+<source>requirements_dev.txt</source>
+<document_content>
+bump2version>=0.5.11
+wheel>=0.33.6
+watchdog>=0.9.0
+flake8>=3.7.8
+tox>=3.14.0
+coverage>=4.5.4
+Sphinx>=1.8.5
+twine>=1.14.0
+
+
+black>=21.7b0
+
+</document_content>
+</document>
+
+<document index="20">
+<source>scripts/build-binary.sh</source>
+<document_content>
+#!/bin/bash
+# this_file: scripts/build-binary.sh
+
+# Binary build script for keynote-slides-freezer
+set -e
+
+echo "🏗️  Building binary for keynote-slides-freezer..."
+
+# Check if running on macOS
+if [[ "$OSTYPE" != "darwin"* ]]; then
+    echo "❌ Binary build is only supported on macOS"
+    exit 1
+fi
+
+# Update version from git tags
+echo "📝 Updating version from git tags..."
+python version.py update
+
+# Install PyInstaller if not present
+echo "📦 Installing PyInstaller..."
+python -m pip install --upgrade pyinstaller
+
+# Clean previous builds
+echo "🧹 Cleaning previous builds..."
+rm -rf build/ dist/
+
+# Build binary
+echo "🔨 Building binary with PyInstaller..."
+pyinstaller --onefile \
+    --name keynote_freezer \
+    --add-data "keynote_slides_freezer:keynote_slides_freezer" \
+    --hidden-import=keynote_slides_freezer.cli \
+    --hidden-import=keynote_slides_freezer.keynote_slides_freezer \
+    keynote_slides_freezer/cli.py
+
+# Test the binary
+echo "🧪 Testing binary..."
+./dist/keynote_freezer --help
+
+# Get version for packaging
+VERSION=$(python version.py)
+echo "📦 Packaging version: $VERSION"
+
+# Create binary package
+echo "📁 Creating binary package..."
+mkdir -p binary-release
+cp dist/keynote_freezer binary-release/
+cp README.md binary-release/
+cp LICENSE binary-release/
+
+# Create installation script
+cat > binary-release/install.sh << 'EOF'
+#!/bin/bash
+# Installation script for keynote_freezer binary
+
+INSTALL_DIR="/usr/local/bin"
+BINARY_NAME="keynote_freezer"
+
+# Check if running on macOS
+if [[ "$OSTYPE" != "darwin"* ]]; then
+    echo "❌ This binary is only compatible with macOS"
+    exit 1
+fi
+
+# Check if user has write permissions to install directory
+if [[ ! -w "$INSTALL_DIR" ]]; then
+    echo "🔐 Installing to $INSTALL_DIR requires sudo permissions"
+    sudo cp "$BINARY_NAME" "$INSTALL_DIR/"
+    sudo chmod +x "$INSTALL_DIR/$BINARY_NAME"
+else
+    cp "$BINARY_NAME" "$INSTALL_DIR/"
+    chmod +x "$INSTALL_DIR/$BINARY_NAME"
+fi
+
+echo "✅ keynote_freezer installed to $INSTALL_DIR"
+echo "🚀 You can now run: keynote_freezer --help"
+EOF
+
+chmod +x binary-release/install.sh
+
+# Create README for binary release
+cat > binary-release/README-BINARY.md << 'EOF'
+# keynote_freezer Binary Release
+
+This is a standalone binary release of keynote_freezer for macOS.
+
+## Installation
+
+### Option 1: Automatic installation
+```bash
+./install.sh
+```
+
+### Option 2: Manual installation
+1. Copy the `keynote_freezer` binary to a directory in your PATH (e.g., `/usr/local/bin`)
+2. Make it executable: `chmod +x /usr/local/bin/keynote_freezer`
+
+## Usage
+
+```bash
+keynote_freezer --help
+keynote_freezer your-presentation.key
+```
+
+## Requirements
+
+- macOS 10.15 or later
+- Apple Keynote installed
+
+## Support
+
+For support and documentation, visit: https://github.com/twardoch/keynote-slides-freezer
+EOF
+
+# Create archive
+cd binary-release
+tar -czf ../keynote_freezer-$VERSION-macos.tar.gz *
+cd ..
+
+echo "✅ Binary build completed!"
+echo "📦 Binary package: keynote_freezer-$VERSION-macos.tar.gz"
+echo "🚀 To install locally: cd binary-release && ./install.sh"
+</document_content>
+</document>
+
+<document index="21">
+<source>scripts/build.sh</source>
+<document_content>
+#!/bin/bash
+# this_file: scripts/build.sh
+
+# Build script for keynote-slides-freezer
+set -e
+
+echo "🔧 Building keynote-slides-freezer..."
+
+# Update version from git tags
+echo "📝 Updating version from git tags..."
+python3 version.py update
+
+# Clean previous builds
+echo "🧹 Cleaning previous builds..."
+rm -rf build/ dist/ *.egg-info/
+
+# Install build dependencies
+echo "📦 Installing build dependencies..."
+python3 -m pip install --upgrade pip build twine
+
+# Build package
+echo "🏗️  Building package..."
+python3 -m build
+
+# Verify the build
+echo "✅ Verifying build..."
+python3 -m twine check dist/*
+
+echo "✨ Build completed successfully!"
+echo "📁 Built packages:"
+ls -la dist/
+</document_content>
+</document>
+
+<document index="22">
+<source>scripts/dev-setup.sh</source>
+<document_content>
+#!/bin/bash
+# this_file: scripts/dev-setup.sh
+
+# Development setup script for keynote-slides-freezer
+set -e
+
+echo "🛠️  Setting up development environment for keynote-slides-freezer..."
+
+# Check if Python 3.10+ is available
+python_version=$(python --version 2>&1 | awk '{print $2}')
+required_version="3.10"
+
+if ! python -c "import sys; exit(0 if sys.version_info >= (3, 10) else 1)"; then
+    echo "❌ Python 3.10+ required. Current version: $python_version"
+    exit 1
+fi
+
+echo "✅ Python version: $python_version"
+
+# Install the package in development mode
+echo "📦 Installing package in development mode..."
+python -m pip install --upgrade pip
+python -m pip install -e ".[dev]"
+
+# Install pre-commit hooks (if available)
+if command -v pre-commit &> /dev/null; then
+    echo "🪝 Installing pre-commit hooks..."
+    pre-commit install
+fi
+
+# Create basic .env file if it doesn't exist
+if [ ! -f .env ]; then
+    echo "📝 Creating .env file..."
+    cat > .env << EOF
+# Development environment variables
+PYTHONPATH=.
+EOF
+fi
+
+echo "✅ Development environment setup completed!"
+echo ""
+echo "🚀 Quick start:"
+echo "  Run tests:    ./scripts/test.sh"
+echo "  Build:        ./scripts/build.sh"
+echo "  Release:      ./scripts/release.sh <version>"
+echo ""
+echo "💡 Available commands:"
+echo "  keynote_freezer --help"
+</document_content>
+</document>
+
+<document index="23">
+<source>scripts/release.sh</source>
+<document_content>
+#!/bin/bash
+# this_file: scripts/release.sh
+
+# Release script for keynote-slides-freezer
+set -e
+
+# Check if version tag is provided
+if [ -z "$1" ]; then
+    echo "Usage: $0 <version> [--dry-run]"
+    echo "Example: $0 1.0.0"
+    echo "Example: $0 1.0.0 --dry-run"
+    exit 1
+fi
+
+VERSION=$1
+DRY_RUN=${2:-}
+
+# Validate version format (basic semver)
+if ! echo "$VERSION" | grep -E "^[0-9]+\.[0-9]+\.[0-9]+$" > /dev/null; then
+    echo "❌ Invalid version format. Use semantic versioning (e.g., 1.0.0)"
+    exit 1
+fi
+
+echo "🚀 Preparing release $VERSION..."
+
+# Check if we're on the main branch
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+if [ "$CURRENT_BRANCH" != "main" ]; then
+    echo "❌ Releases must be made from the main branch. Current branch: $CURRENT_BRANCH"
+    exit 1
+fi
+
+# Check if working directory is clean
+if [ -n "$(git status --porcelain)" ]; then
+    echo "❌ Working directory is not clean. Please commit or stash changes."
+    exit 1
+fi
+
+# Check if tag already exists
+if git tag -l | grep -q "^v$VERSION$"; then
+    echo "❌ Tag v$VERSION already exists"
+    exit 1
+fi
+
+# Run tests
+echo "🧪 Running tests..."
+./scripts/test.sh
+
+# Build package
+echo "🏗️  Building package..."
+./scripts/build.sh
+
+if [ "$DRY_RUN" = "--dry-run" ]; then
+    echo "🔍 DRY RUN: Would create tag v$VERSION and push to repository"
+    echo "🔍 DRY RUN: Would upload to PyPI"
+    echo "✅ Dry run completed successfully!"
+else
+    # Create and push tag
+    echo "📝 Creating git tag v$VERSION..."
+    git tag -a "v$VERSION" -m "Release v$VERSION"
+    
+    echo "📤 Pushing tag to repository..."
+    git push origin "v$VERSION"
+    
+    # Upload to PyPI
+    echo "📦 Uploading to PyPI..."
+    python -m twine upload dist/*
+    
+    echo "✅ Release $VERSION completed successfully!"
+    echo "🎉 Package uploaded to PyPI and tag pushed to repository"
+fi
+</document_content>
+</document>
+
+<document index="24">
+<source>scripts/test.sh</source>
+<document_content>
+#!/bin/bash
+# this_file: scripts/test.sh
+
+# Test script for keynote-slides-freezer
+set -e
+
+echo "🧪 Running tests for keynote-slides-freezer..."
+
+# Install test dependencies
+echo "📦 Installing test dependencies..."
+python -m pip install --upgrade pip
+python -m pip install -e ".[dev]"
+
+# Run code formatting check
+echo "🎨 Checking code formatting with black..."
+python -m black --check keynote_slides_freezer/ tests/ || {
+    echo "❌ Code formatting issues found. Run 'python -m black keynote_slides_freezer/ tests/' to fix."
+    exit 1
+}
+
+# Run linting
+echo "🔍 Running linting with flake8..."
+python -m flake8 keynote_slides_freezer/ tests/ --max-line-length=88 --extend-ignore=E203,W503
+
+# Run type checking
+echo "🔬 Running type checking with mypy..."
+python -m mypy keynote_slides_freezer/ --ignore-missing-imports
+
+# Run tests
+echo "🧪 Running pytest..."
+python -m pytest tests/ -v
+
+echo "✅ All tests passed!"
+</document_content>
+</document>
+
+# File: /Users/adam/Developer/vcs/github.twardoch/pub/keynote-slides-freezer/setup.py
+# Language: python
+
+import re
+from pathlib import Path
+from setuptools import find_packages, setup
+
+def get_version((*args)):
+
+
+# File: /Users/adam/Developer/vcs/github.twardoch/pub/keynote-slides-freezer/tests/__init__.py
+# Language: python
+
+
+
+# File: /Users/adam/Developer/vcs/github.twardoch/pub/keynote-slides-freezer/tests/test_imports.py
+# Language: python
+
+import pytest
+import sys
+import platform
+import keynote_slides_freezer
+from keynote_slides_freezer import cli
+from keynote_slides_freezer import KeynoteSlidesFreezer
+from keynote_slides_freezer import KeynoteSlidesFreezer
+
+def test_import_main_module(()):
+    """Test that main module imports correctly."""
+
+def test_import_cli(()):
+    """Test that CLI module imports correctly."""
+
+def test_import_freezer_class(()):
+    """Test that KeynoteSlidesFreezer class can be imported."""
+
+def test_class_initialization(()):
+    """Test that KeynoteSlidesFreezer can be instantiated (basic structure test)."""
+
+
+# File: /Users/adam/Developer/vcs/github.twardoch/pub/keynote-slides-freezer/tests/test_version.py
+# Language: python
+
+import pytest
+import re
+import platform
+from keynote_slides_freezer import __version__
+import os
+import sys
+from keynote_slides_freezer import __version__
+import os
+import sys
+
+def test_version_format(()):
+    """Test that version follows semantic versioning format."""
+
+def test_version_exists(()):
+    """Test that version is defined."""
+
+
+# File: /Users/adam/Developer/vcs/github.twardoch/pub/keynote-slides-freezer/version.py
+# Language: python
+
+import subprocess
+import re
+import sys
+from pathlib import Path
+
+def get_git_version(()):
+    """Get version from git tags and commits."""
+
+def update_version_in_init(()):
+    """Update version in __init__.py file."""
+
+
+</documents>
